@@ -3,13 +3,23 @@ import requests
 import json
 import sys
 from datetime import datetime
+import sqlite3
 
 api_key = config.api_key
+db_name = "weather_db.db"
 
 city_code = {
         "laguardia airport": "2627477",
         "london city airport": "2532754"
         }
+
+sql_statements = [
+    """CREATE TABLE IF NOT EXISTS weather_forecasts (
+        call_date DATE PRIMARY KEY,
+        forecast_date DATE NOT NULL,
+        max_temp INTEGER NOT NULL
+    );"""
+        ]
 
 def get_url(city):
     location_key = city_code[city]
@@ -43,7 +53,54 @@ def consume_json_dict(json_dict):
     max_temp = json_dict["DailyForecasts"][0]["Temperature"]["Maximum"]["Value"]
     return call_date, date, max_temp
 
+def create_db():
+    try:
+        with sqlite3.connect(db_name) as conn:
+            print("opened database")
+
+    except sqlite3.OperationalError as e:
+        print("error in create_db(): ", e)
+
+def create_table_db():
+    try:
+        with sqlite3.connect(db_name) as conn:
+            cursor = conn.cursor()
+
+            for statement in sql_statements:
+                cursor.execute(statement)
+
+            conn.commit()
+
+            print("tables created")
+
+    except sqlite3.OperationalError as e:
+        print("error in create_table(): ", e)
+
+def add_forecast_db(conn, weather_forecasts):
+    sql = ''' INSERT INTO weather_forecasts(call_date, forecast_date, max_temp)
+              VALUES(?,?,?) '''
+
+    cur = conn.cursor()
+
+    cur.execute(sql, weather_forecasts)
+
+    conn.commit()
+
+    return cur.lastrowid
+
+def insert_data_db(weather_data):
+    try:
+        with sqlite3.connect(db_name) as conn:
+            # print(weather_data)
+            weather_id = add_forecast_db(conn, weather_data)
+            print("created a row of weather data", weather_id)
+
+    except sqlite3.Error as e:
+        print(e)
+
 def main():
+    create_db()
+    create_table_db()
     url = get_url("laguardia airport")
     cmd = int(sys.argv[1])
     if cmd == 1:
@@ -55,6 +112,8 @@ def main():
         values = consume_json_dict(json_dict)
         for v in values:
             print(v)
+
+        insert_data_db(values)
 
 if __name__ == '__main__':
     main()
