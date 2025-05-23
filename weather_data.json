@@ -1,0 +1,50 @@
+{
+    "Headline": {
+        "EffectiveDate": "2025-05-23T14:00:00-04:00",
+        "EffectiveEpochDate": 1748023200,
+        "Severity": 5,
+        "Text": "Expect showery weather this afternoon through early this evening",
+        "Category": "rain",
+        "EndDate": "2025-05-23T23:00:00-04:00",
+        "EndEpochDate": 1748055600,
+        "MobileLink": "http://www.accuweather.com/en/us/laguardia-airport-ny/11371/daily-weather-forecast/2627477?lang=en-us",
+        "Link": "http://www.accuweather.com/en/us/laguardia-airport-ny/11371/daily-weather-forecast/2627477?lang=en-us"
+    },
+    "DailyForecasts": [
+        {
+            "Date": "2025-05-23T07:00:00-04:00",
+            "EpochDate": 1747998000,
+            "Temperature": {
+                "Minimum": {
+                    "Value": 52.0,
+                    "Unit": "F",
+                    "UnitType": 18
+                },
+                "Maximum": {
+                    "Value": 62.0,
+                    "Unit": "F",
+                    "UnitType": 18
+                }
+            },
+            "Day": {
+                "Icon": 13,
+                "IconPhrase": "Mostly cloudy w/ showers",
+                "HasPrecipitation": true,
+                "PrecipitationType": "Rain",
+                "PrecipitationIntensity": "Light"
+            },
+            "Night": {
+                "Icon": 36,
+                "IconPhrase": "Intermittent clouds",
+                "HasPrecipitation": true,
+                "PrecipitationType": "Rain",
+                "PrecipitationIntensity": "Light"
+            },
+            "Sources": [
+                "AccuWeather"
+            ],
+            "MobileLink": "http://www.accuweather.com/en/us/laguardia-airport-ny/11371/daily-weather-forecast/2627477?day=1&lang=en-us",
+            "Link": "http://www.accuweather.com/en/us/laguardia-airport-ny/11371/daily-weather-forecast/2627477?day=1&lang=en-us"
+        }
+    ]
+}
