@@ -17,7 +17,8 @@ sql_statements = [
     """CREATE TABLE IF NOT EXISTS weather_forecasts (
         call_date DATE PRIMARY KEY,
         forecast_date DATE NOT NULL,
-        max_temp INTEGER NOT NULL
+        max_temp INTEGER NOT NULL,
+        city_code INTEGER NOT NULL
     );"""
         ]
 
@@ -77,8 +78,8 @@ def create_table_db():
         print("error in create_table(): ", e)
 
 def add_forecast_db(conn, weather_forecasts):
-    sql = ''' INSERT INTO weather_forecasts(call_date, forecast_date, max_temp)
-              VALUES(?,?,?) '''
+    sql = ''' INSERT INTO weather_forecasts(call_date, forecast_date, max_temp, city_code)
+              VALUES(?,?,?,?) '''
 
     cur = conn.cursor()
 
@@ -101,7 +102,8 @@ def insert_data_db(weather_data):
 def main():
     create_db()
     create_table_db()
-    url = get_url("laguardia airport")
+    city = "laguardia airport"
+    url = get_url(city)
     cmd = int(sys.argv[1])
     if cmd == 1:
         data = call_api(url)
@@ -110,6 +112,9 @@ def main():
     elif cmd == 2:
         json_dict = read_json("weather_data.json")
         values = consume_json_dict(json_dict)
+        values = list(values)
+        values.append(city_code[city])
+        values = tuple(values)
         for v in values:
             print(v)
 
