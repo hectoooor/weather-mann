@@ -1,7 +1,8 @@
-import requests
 import json
 import sqlite3
-from datetime import datetime, timezone
+from datetime import datetime
+
+import requests
 
 station_data = "stationdata.json"
 noaa_forecast_url = "https://api.weather.gov/gridpoints/{wfo}/{x},{y}/forecast"
@@ -36,9 +37,9 @@ def call_api(url, t):
     s_data = json.dumps(json_data, indent=4)
     return s_data
 
-def make_db(cur):
-    #make pk datetime of the api call and add a query to search for a dates forecast then compare over time
-    cur.execute("""
+def make_db(conn):
+    cursor = conn.cursor()
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS  weather (
             req_date TEXT,
             start_date TEXT,
@@ -49,9 +50,13 @@ def make_db(cur):
         )
     """)
 
-def insert_weather_data(cur, json_dict, city):
+    conn.commit()
+
+def insert_weather_data(conn, json_dict, city):
+    cursor = conn.cursor()
     now = datetime.now().isoformat(timespec="seconds")
 
+    #14 becuase the api call sends 14 forecasts
     for i in range(14):
         start_date = json_dict["properties"]["periods"][i]["startTime"]
         end_date = json_dict["properties"]["periods"][i]["endTime"]
@@ -59,30 +64,41 @@ def insert_weather_data(cur, json_dict, city):
         rain = json_dict["properties"]["periods"][i]["probabilityOfPrecipitation"]["value"]
         #print(start_date, end_date, city, temp, rain)
 
-        cur.execute(
+        cursor.execute(
                 "INSERT INTO weather (req_date, start_date, end_date, city, max_temp, rain_chance) VALUES (?, ?, ?, ?, ?, ?)",
                 (now, start_date, end_date, city, temp, rain)
         )
 
-def search_date(cur, search_term):
-    cur.execute("""SELECT * FROM weather WHERE start_date LIKE ?""", (f"%{search_term}%",))
-    res = cur.fetchall()
-
-    return res
+    conn.commit()
 
 def start(tar_city, db_name):
+    print("2")
     json_dict = call_api(get_url(tar_city), "json")
-    s_data = json.dumps(json_dict["properties"]["periods"], indent=4)
+    #s_data = json.dumps(json_dict["properties"]["periods"], indent=4)
     #print(s_data)
 
     conn = sqlite3.connect(db_name)
-    cursor = conn.cursor()
 
-    make_db(cursor)
+    make_db(conn)
 
-    insert_weather_data(cursor, json_dict, tar_city)
+    insert_weather_data(conn, json_dict, tar_city)
 
     conn.commit()
     conn.close()
 
-#todo tommorow, finish scheduler, push to github, configure github actions so that program runs on chron jobs
+#todo add more date formats functionality
+def search_date(db_name, search_term):
+    conn = sqlite3.connect(db_name)
+    cur = conn.cursor()
+
+    # must be in "yyyy-mm-dd" format, ie: 2000-01-01
+    cur.execute("""SELECT * FROM weather WHERE start_date LIKE ?""", (f"%{search_term}%",))
+    res = cur.fetchall()
+
+    conn.commit()
+    conn.close()
+
+    #returns whole row containing the start_date
+    return res
+
+#todo tommorow, configure github actions so that program runs on chron jobs, work more on scheduler and add context manager and exception handling
