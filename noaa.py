@@ -72,7 +72,6 @@ def insert_weather_data(conn, json_dict, city):
     conn.commit()
 
 def start(tar_city, db_name):
-    print("2")
     json_dict = call_api(get_url(tar_city), "json")
     #s_data = json.dumps(json_dict["properties"]["periods"], indent=4)
     #print(s_data)
