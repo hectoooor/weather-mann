@@ -1,0 +1,1 @@
+cityname: [latitude, longitude], officeId, [gridX, gridY], zone type, zoneId
