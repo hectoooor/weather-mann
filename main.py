@@ -25,5 +25,5 @@ if __name__ == '__main__':
     #search("noaa.db", "2026-10-31")
 
 
-    noaa.start("miami", "noaa.db")
-    #loop("miami", "noaa.db")
+    #noaa.start("miami", "noaa.db")
+    loop("miami", "noaa.db")
